@@ -132,9 +132,9 @@ def youre_surrounded(board,row,col,color,wanted_neighbors):
                         if board[(multiplier*row_shift)+row][(multiplier*col_shift)+col] == color:
                             can_flip = False
                             break
-                    if can_flip:
-                        validity=True
-                        lets_flip.update(temp_flip)
+                if can_flip:
+                    validity=True
+                    lets_flip.update(temp_flip)
     lets_flip['validity'] = validity
     return(lets_flip)
 

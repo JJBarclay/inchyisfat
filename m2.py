@@ -1,7 +1,7 @@
 import turtle
 import math
 import random
-
+random.seed(0) # fix the guesses to make debug easier; remove in production.
 y_locations = {0:750,1:650,2:550,3:450,4:350,5:250,6:150,7:50} #global constant of y-locations of game board columns
 x_locations = {0:60,1:160,2:260,3:360,4:460,5:560,6:660,7:760} #global constant of x-locations of game board rows
 
@@ -88,10 +88,10 @@ def on_board(x_loc, y_loc):
 
 def neighborhood_watch(board,row,col): #identifies and returns a square's neighbors
     neighbor_list = {}
-    for x_shift, y_shift in [[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]]: #location of neighbors relatively
-        if on_board(x_shift + row,y_shift + col) == True:
-            occupant = board[int(x_shift + row)][int(y_shift + col)]
-            neighbor_list[int(x_shift + row),int(y_shift + col)] = occupant
+    for row_shift, col_shift in [[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]]: #location of neighbors relatively
+        if on_board(row_shift + row,col_shift + col) == True:
+            occupant = board[int(row_shift + row)][int(col_shift + col)]
+            neighbor_list[int(row_shift + row),int(col_shift + col)] = occupant
     return(neighbor_list) #returns dictionary with locations as keys and occupants as values
 
 def neighbor_check(board,row,col,color): #true or false for if there is an opponent in neighbors
@@ -118,32 +118,38 @@ def youre_surrounded(board,row,col,color,wanted_neighbors):
         opponent = 'W'
     else:
         opponent = 'B'
+
+    validity = False
     for location in wanted_neighbors.keys(): #for each location that has an opponent's token
-        for x_shift, y_shift in [[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]]: #for directional checking
-            if (x_shift + row,y_shift + col) == location: #find which shift for directional checking
-                    for multiplier in [1,2,3,4,5,6,7]: #max distance is 7 from initial
-                        if on_board((multiplier*x_shift)+row,(multiplier*y_shift)+col):
-                            if board[(multiplier*x_shift)+row][(multiplier*y_shift)+col] == opponent:
-                                lets_flip[(multiplier*x_shift)+row,(multiplier*y_shift)+col] = color
-                            if board[(multiplier*x_shift)+row][(multiplier*y_shift)+col] == color:
-                                lets_flip['validity'] = True
-                                break
-                            else:
-                                lets_flip['validity'] = False
+        for row_shift, col_shift in [[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]]: #for directional checking
+            temp_flip={}
+            can_flip=True
+            if (row_shift + row,col_shift + col) == location: #find which shift for directional checking
+                for multiplier in [1,2,3,4,5,6,7]: #max distance is 7 from initial
+                    if on_board((multiplier*row_shift)+row,(multiplier*col_shift)+col):
+                        if board[(multiplier*row_shift)+row][(multiplier*col_shift)+col] == opponent:
+                            temp_flip[(multiplier*row_shift)+row,(multiplier*col_shift)+col] = color
+                        if board[(multiplier*row_shift)+row][(multiplier*col_shift)+col] == color:
+                            can_flip = False
+                            break
+                    if can_flip:
+                        validity=True
+                        lets_flip.update(temp_flip)
+    lets_flip['validity'] = validity
     return(lets_flip)
 
 def isValidMove(board, row, col, color): #checks if move is valid by calling helper functions
     x_val = int(row)
     y_val = int(col)
     neighbor_dict = neighborhood_watch(board, row, col)
-    if board[x_val][y_val] != 'B'or 'W':
+    if board[x_val][y_val] not in ['B','W']:
         if neighbor_check(board, row, col,color) !=False:
             wanted_ones = neighbor_check(board,row,col,color)
             if youre_surrounded(board,row,col,color,wanted_ones) != {}:
                 lets_flip = youre_surrounded(board,row,col,color,wanted_ones)
                 if lets_flip['validity'] == True:
                     return(True,lets_flip)
-        return(False,None)
+    return(False,None)
 
 def getValidMoves(board, color):
     valid_moves = []

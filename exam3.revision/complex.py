@@ -30,7 +30,7 @@ class Complex: #class Complex initiator
             rv = str(self.__real) + ' - ' +  str(self.__imaginary) + 'i'
         else:
             rv = str(self.__real)
-            
+
         #print("BB> complex.repr about to return {rv}".format(**vars()))
         return rv
 

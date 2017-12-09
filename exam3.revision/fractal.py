@@ -4,21 +4,22 @@ import turtle
 
 class Display:
     def __init__(self):
+         turtle.setup(height=300, width=300)
          self.t = turtle.Turtle()
          self.__s = turtle.Screen()
-         self.__s.screensize(200,200)
+         turtle.hideturtle()
          self._screen = turtle.getscreen()
          self.t.ht()
          self.t.penup()
-
+         
          self.t.speed(0)
-         self.__s.tracer(100,0)
-         for screen_y in range(0, 201):
-            for screen_x in range(0, 201):
+         self.__s.tracer(500,0)
+         for screen_y in range(-150, 150):
+            for screen_x in range(-150, 150):
                 self.t.goto(screen_x,screen_y)
-                x = screen_x/100.0 - 1.0
-                y = screen_y/100.0 - 1.0
-                point = Complex(x,y)
+                r = screen_x * 2.0 / 150 
+                i = screen_y * 2.0 / 150  
+                point = Complex(r,i)
                 #print(point)
                 mandel_val = Mandelbrot(point)
                 color = mandel_val.get_color()
